@@ -7,14 +7,24 @@ namespace Acme\Controller;
 
 		public function read($conn){
 
+            $data=null;
+			$sql = "SELECT * FROM guest;";
+			$result = $conn->query($sql);
+			//$result = mysqli_query($conn,$sql);
 
-			$sql = "SELECT * FROM guests ORDER BY guestID DESC;";
-			//$result = $conn->query($sql); 
-			$result = mysqli_query($conn,$sql);
+			if($result->num_row === 0){
 
+				echo "No rows found";
+			}
+			else{
 
+            	while ( $row = $result->fetch_array(MYSQLI_ASSOC)) {
+                	$data[] = $row;
+            	}
 
-			return $result;
+        	}
+
+            return $data;
 
 
 
@@ -22,23 +32,30 @@ namespace Acme\Controller;
 
 		public function insert($conn,$data){
 
-			$sql = "INSERT INTO guests values ('$data[id]','$data[name]','$data[surname]')";
-			$result = $conn->query($sql);
+			$sql = "INSERT INTO guest value (?,?,?)";
+            $stmt = $conn->prepare($sql);
 
-			return $result;
+            $stmt -> bind_param("iss",$data[id],$data[name],$data[surname]);
+
+			$stmt->execute();
+
+		//	return $result;
 
 		}
 
 		public function update($conn,$data){
-			$sql = "UPDATE guests set name='$data[name]', surname='$data[surname]' where id='$data[id]'";
+			$sql = "UPDATE guest set name='$data[name]', surname='$data[surname]' where id='$data[id]'";
 			$result = $conn ->query($sql);
 
 
 		}
 
 		public function delete($conn,$id){
-			$sql = "DELETE from guests where id='$id'";
-			$result = $conn ->query($sql);
+			$sql = "DELETE from guest where id=?";
+			$stmt = $conn->prepare($sql);
+			$stmt -> bind_param("i",$id);
+
+			$stmt ->execute();
 
 		}
 

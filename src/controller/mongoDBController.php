@@ -7,12 +7,34 @@ namespace Acme\Controller;
 		public function read($conn){
 
 
+		    $data = null;
+
+		    $table = $conn->myguest;
+
+		    $cursor = $table->find();
+
+		    foreach ($cursor as $document){
+
+		        $data[] = $document;
+            }
+
+           // var_dump($data);
+
+            return $data;
+
+
 		}
 
 		public function insert($conn,$data){
 
+		    $table = $conn->myguest;
 
-		}
+            //var_dump($data);
+
+            $table->insertOne(["_id" => (int) $data[id],"name"=>$data[name],"prezime"=>$data[prezime]]);
+          //  $table->insert(["_id" => (int) $data[id],"name"=>$data[name],"prezime"=>$data[prezime]]);
+
+        }
 
 		public function update($conn,$id){
 
@@ -20,7 +42,10 @@ namespace Acme\Controller;
 		}
 
 		public function delete($conn,$id){
-			
+
+            $table = $conn->myguest;
+
+            $table->deleteOne(['_id'=> (int) $id]);
 		}
 
 

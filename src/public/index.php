@@ -4,17 +4,17 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 
 require '../../vendor/autoload.php';
-//require 'ConnectionWrapper.php';
 
 $configSQL = include('../connection/config.php');
 $configMongo = include('../connection/configMongo.php');
 
-//$cat = new \Acme\connection\Cat("something");
-
 $connection = new \Acme\connection\CnWrapper();
-$type = "mysql";
+
+//CHANGE $TYPE TO SWITCH BEETWEEN DATABASES
+$type = "mongo";
 $database=null;
 $conn = null;
+
 if($type == "mongo"){
 
     $conn = $connection->getConnection($configMongo,$type);
@@ -43,37 +43,41 @@ $app->get('/',function (Request $request,Response $response){
 });
 
 //Read all
-$app->get('/guests', function () use($app,$database,$conn) {
+$app->get('/guests', function (Request $request,Response $response) use($app,$database,$conn) {
 
 
 
-    $result = $database->read($conn);
-
-
-    while ( $row = $result->fetch_assoc()) {
+   $data = $database->read($conn);
+   /* while ( $row = $result->fetch_assoc()) {
         $data[] = $row;
-    }
+    }   */
 
-    $app->render('guests.php', array(
-            'page_title' => "Your Friends",
+   // print_r($data);
+  /*  $app->render('guests.php', array(
             'data' => $data
         )
     );
+  */
+
+    $response = $this->view->render($response, "guests.phtml", array('data'=>$data));
+    return $response;
 
 
-    //echo "something";
-
-});
+})->setName('guestPage');;
 
 //CREATE
 $app->post('/guests',function (Request $request, Response $response) use($database,$conn){
 
 
     $data = $request->getParsedBody();
+    //print_r($data);
     $database ->insert($conn,$data);
 
+    //echo "all clear";
+    //$app->response->redirect($app->urlFor(''));
 
-
+    //Returning to get route after the insert
+    return $response->withRedirect($this->router->pathFor('guestPage'));
 
 });
 //UPDATE
@@ -82,9 +86,9 @@ $app->put('/guests/{id}',function(Request $request,Response $response)use($datab
 
     $data = $request->getParsedBody();
 
-     $database->update($conn,$data);
+    $database->update($conn,$data);
 
-
+    return $response->withRedirect($this->router->pathFor('guestPage'));
 
 });
 //DELETE
@@ -93,6 +97,8 @@ $app->delete('/guests/{id}',function(Request $request,Response $response)use($da
 
     $id = $request->getAttribute('id');
     $database->delete($conn,$id);
+
+    return $response->withRedirect($this->router->pathFor('guestPage'));
 });
 
 
