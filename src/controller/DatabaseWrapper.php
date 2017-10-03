@@ -12,7 +12,6 @@ class DatabaseWrapper {
 
         //trying to return sql select object
 		$result =  $this->crud->read($conn);
-
 		//print_r($this);
 		return $result;
 
@@ -23,9 +22,9 @@ class DatabaseWrapper {
 		$this->crud->insert($conn,$data);
 	}
 
-	public function update($conn,$data){
+	public function update($conn,$id,$data){
 
-		$this->crud->update($conn,$data);
+		$this->crud->update($conn,$id,$data);
 
 	}
 
