@@ -1,0 +1,30 @@
+<html>
+<head>
+<body>
+	<table>
+		
+		{% for i in data %}
+		<tr>
+			<td>
+				{{i._id}}
+                {{i.id}}
+			</td>
+			<td>
+				{{i.name}}
+			</td>
+			<td>
+				{{i.surname}}
+                {{i.prezime}}
+			</td>
+		</tr>
+		{% endfor %}
+
+
+	</table>
+	
+
+
+</body>
+</head>
+</html>
+
