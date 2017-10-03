@@ -22,9 +22,9 @@ class DatabaseWrapper {
 		$this->crud->insert($conn,$data);
 	}
 
-	public function update($conn,$data){
+	public function update($conn,$id,$data){
 
-		$this->crud->update($conn,$data);
+		$this->crud->update($conn,$id,$data);
 
 	}
 

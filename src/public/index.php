@@ -1,17 +1,21 @@
 <?php
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 require '../../vendor/autoload.php';
 
 $configSQL = include('../connection/config.php');
 $configMongo = include('../connection/configMongo.php');
 
+
 $connection = new \Acme\connection\CnWrapper();
 
 //CHANGE $TYPE TO SWITCH BEETWEEN DATABASES
 $type = "mongo";
+
+
 $database=null;
 $conn = null;
 
@@ -25,6 +29,9 @@ if($type == "mongo"){
     $database = new Acme\Controller\databaseWrapper(new Acme\Controller\mySQLController());
 
 }
+
+$log = new Logger('name');
+$log->pushHandler(new StreamHandler('../../logs/logger.log', Logger::INFO));
 
 
 $app = new \Slim\App;
@@ -43,7 +50,7 @@ $app->get('/',function (Request $request,Response $response){
 });
 
 //Read all
-$app->get('/guests', function (Request $request,Response $response) use($app,$database,$conn) {
+$app->get('/guests', function (Request $request,Response $response) use($app,$database,$conn,$log) {
 
 
 
@@ -51,7 +58,7 @@ $app->get('/guests', function (Request $request,Response $response) use($app,$da
    /* while ( $row = $result->fetch_assoc()) {
         $data[] = $row;
     }   */
-
+    $log->info('Read all the guests');
    // print_r($data);
   /*  $app->render('guests.php', array(
             'data' => $data
@@ -66,13 +73,13 @@ $app->get('/guests', function (Request $request,Response $response) use($app,$da
 })->setName('guestPage');;
 
 //CREATE
-$app->post('/guests',function (Request $request, Response $response) use($database,$conn){
+$app->post('/guests',function (Request $request, Response $response) use($database,$conn,$log){
 
 
     $data = $request->getParsedBody();
     //print_r($data);
     $database ->insert($conn,$data);
-
+    $log->info('Created a new guest');
     //echo "all clear";
     //$app->response->redirect($app->urlFor(''));
 
@@ -85,8 +92,8 @@ $app->put('/guests/{id}',function(Request $request,Response $response)use($datab
 
 
     $data = $request->getParsedBody();
-
-    $database->update($conn,$data);
+    $id = $request->getAttribute('id');
+    $database->update($conn,$id,$data);
 
     return $response->withRedirect($this->router->pathFor('guestPage'));
 

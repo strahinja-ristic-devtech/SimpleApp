@@ -43,9 +43,14 @@ namespace Acme\Controller;
 
 		}
 
-		public function update($conn,$data){
-			$sql = "UPDATE guest set name='$data[name]', surname='$data[surname]' where id='$data[id]'";
-			$result = $conn ->query($sql);
+		public function update($conn,$id,$data){
+			$sql = "UPDATE guest set name=?, surname=? where id=?";
+			$stmt = $conn ->prepare($sql);
+
+            $stmt ->bind_param("ssi",$data[name],$data[surname],$id);
+
+
+			$stmt->execute();
 
 
 		}

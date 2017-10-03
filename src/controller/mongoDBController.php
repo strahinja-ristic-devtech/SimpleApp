@@ -36,9 +36,11 @@ namespace Acme\Controller;
 
         }
 
-		public function update($conn,$id){
+		public function update($conn,$id,$data){
+		    $table = $conn->myguest;
 
-
+            $newdata = array('$set'=> array($data));
+		    $table->updateOne(["_id"=> (int) $id],['$set'=>["name"=>$data[name],"prezime"=>$data[prezime]]]);
 		}
 
 		public function delete($conn,$id){
